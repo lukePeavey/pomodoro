@@ -1,10 +1,13 @@
 import React from 'react'
+import Timer from '../Timer'
+import Settings from '../Settings'
 
 export default class App extends React.PureComponent {
   render() {
     return (
-      <div>
-        <span>App Stub</span>
+      <div className="App">
+        <Settings />
+        <Timer />
       </div>
     )
   }
