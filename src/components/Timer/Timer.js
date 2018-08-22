@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
 import ResetIcon from '@material-ui/icons/SettingsBackupRestore'
 import IconButton from '@material-ui/core/IconButton'
+import ProgressIndicator from '../ProgressIndicator'
 import { requestAnimationFrame, cancelAnimationFrame } from '../../utils'
 
 /**
@@ -84,7 +85,7 @@ export default class Timer extends React.PureComponent {
   }
 
   render() {
-    const { remainingTimeString, isRunning, type } = this.props
+    const { remainingTimeString, isRunning, type, percentComplete } = this.props
     return [
       <section className="Timer" key="timer">
         <div className="Timer-content">
@@ -103,6 +104,7 @@ export default class Timer extends React.PureComponent {
             </Button>
           </div>
         </div>
+        <ProgressIndicator percentComplete={percentComplete} />
       </section>
     ]
   }
@@ -121,6 +123,8 @@ Timer.propTypes = {
   isRunning: PropTypes.bool.isRequired,
   /** The high res timestamp when timer was started */
   startTime: PropTypes.number,
+  /** Number representing percentage of elapsed time (for progressIndicator) */
+  percentComplete: PropTypes.number.isRequired,
   /** Bound redux actions */
   actions: PropTypes.shape({
     initializeTimer: PropTypes.func.isRequired,

@@ -4,6 +4,7 @@ import bindActions from '../../utils/bindActions'
 import Timer from './Timer'
 
 const mapStateToProps = (state) => ({
+  percentComplete: selectors.getPercentComplete(state),
   duration: selectors.getDuration(state),
   type: selectors.getTimerType(state),
   remainingTimeString: selectors.getRemainingTimeString(state),

@@ -1,0 +1,20 @@
+.Progress {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: rotate(-90deg);
+}
+
+.Progress-circle {
+  fill: transparent;
+  stroke: #eee;
+  cx: 50;
+  cy: 50;
+}
+
+.Progress-circle.progress {
+  stroke: #b2dfdb;
+}

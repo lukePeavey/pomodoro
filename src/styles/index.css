@@ -1,6 +1,7 @@
 @import url('App.css');
 @import url('Timer.css');
 @import url('Settings.css');
+@import url('ProgressIndicator.css');
 @import url('variables.css');
 
 body {
