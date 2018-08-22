@@ -1,0 +1,24 @@
+.Settings {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin-bottom: 24px;
+}
+
+.Settings-field {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+.Settings-fieldLabel {
+  width: 100%;
+  text-align: center;
+}
+
+.Settings-fieldValue {
+  font-size: 20px;
+}
