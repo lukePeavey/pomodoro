@@ -15,7 +15,27 @@ export const initialState = {
 }
 
 export default function timerReducer(state = initialState, action) {
-  return state
+  switch (action.type) {
+    case actionTypes.INITIALIZE_TIMER: {
+      return { ...initialState, ...action.payload }
+    }
+    case actionTypes.START_TIMER: {
+      // When re-starting a timer that was paused paused, the startTime is set to timestamp - elapsedTime
+      const timestamp = state.startTime
+        ? action.payload - state.elapsedTime
+        : action.payload
+      return { ...state, isRunning: true, startTime: timestamp }
+    }
+    case actionTypes.STOP_TIMER: {
+      return { ...state, isRunning: false }
+    }
+    case actionTypes.UPDATE_ELAPSED_TIME: {
+      return { ...state, elapsedTime: action.payload }
+    }
+
+    default:
+      return state
+  }
 }
 
 /**
@@ -37,22 +57,35 @@ export const selectors = {
    * gets the duration of the timer in milliseconds. This is derived from
    * settings (sessionLength | breakLength)
    */
-  getDuration: (state) => {},
+  getDuration: (state) => {
+    return state.settings[`${state.timer.type.toLowerCase()}Length`] * 60 * 1000
+  },
   /**
    * @computed
    * Returns the percentage of elapsed time
    */
-  getPercentComplete: (state) => {},
+  getPercentComplete: (state) => {
+    return (state.timer.elapsedTime / selectors.getDuration(state)) * 100
+  },
   /**
    * @computed
    * Returns a time string that represents the remaining time in HH:MM:SS
    */
-  getRemainingTimeString: (state) => {},
+  getRemainingTimeString: (state) => {
+    // Gets the remaining time (in milliseconds) and converts to HH:MM:SS
+    const remainingTime = selectors.getDuration(state) - state.timer.elapsedTime
+    const hours = parseInt((remainingTime / (1000 * 60 * 60)) % 24)
+    const minutes = parseInt((remainingTime / (1000 * 60)) % 60)
+    const seconds = parseInt((remainingTime / 1000) % 60)
+    return [hours, minutes, seconds].map((n) => (n < 10 ? `0${n}` : n)).join(':') // prettier-ignore
+  },
   /**
    * @computed
    * returns true if timer is done
    */
-  isTimerDone: (state) => {}
+  isTimerDone: (state) => {
+    return selectors.getElapsedTime(state) >= selectors.getDuration(state)
+  }
 }
 
 /**
@@ -61,17 +94,17 @@ export const selectors = {
 |--------------------------------------------------
 */
 export const actionTypes = {
-  NEW_TIMER: '[timer] NEW_TIMER',
+  INITIALIZE_TIMER: '[timer] INITIALIZE_TIMER',
   START_TIMER: '[timer] START_TIMER',
-  PAUSE_TIMER: '[timer] PAUSE_TIMER',
+  STOP_TIMER: '[timer] STOP_TIMER',
   UPDATE_ELAPSED_TIME: '[timer] UPDATE_ELAPSED_TIME'
 }
 
 export const actions = {
-  /** Starts a new timer of the specified type ('SESSION' | 'BREAK') */
-  newTimer: (type) => ({
-    type: actionTypes.NEW_TIMER,
-    payload: type
+  /** Initializes a new timer */
+  initializeTimer: (state) => ({
+    type: actionTypes.INITIALIZE_TIMER,
+    payload: state
   }),
 
   /** Starts running the current timer. (sets isRunning to true) */
@@ -81,8 +114,8 @@ export const actions = {
   }),
 
   /** Pauses the timer (sets isRunning to f) */
-  pauseTimer: () => ({
-    type: actionTypes.PAUSE_TIMER
+  stopTimer: () => ({
+    type: actionTypes.STOP_TIMER
   }),
 
   /** Updates the elapsed time of the timer.  */
