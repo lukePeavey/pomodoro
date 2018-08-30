@@ -8,7 +8,7 @@ const MAX = 60
 */
 export const initialState = {
   /** length of work session (number of minutes) */
-  sessionLength: 1,
+  sessionLength: 25,
   /** length of a break (number of minutes) */
   breakLength: 5
 }
@@ -16,12 +16,12 @@ export const initialState = {
 export default function settingsReducer(state = initialState, action) {
   switch (action.type) {
     case actionTypes.SET_SESSION_LENGTH: {
-      const value = Math.min(Math.max(parseInt(action.payload), MIN), MAX)
-      return { ...state, sessionLength: value || state.sessionLength }
+      const value = Math.min(Math.max(action.payload, MIN), MAX)
+      return { ...state, sessionLength: value }
     }
     case actionTypes.SET_BREAK_LENGTH: {
-      const value = Math.min(Math.max(parseInt(action.payload), MIN), MAX)
-      return { ...state, breakLength: value || state.breakLength }
+      const value = Math.min(Math.max(action.payload, MIN), MAX)
+      return { ...state, breakLength: value }
     }
     case actionTypes.RESTORE_DEFAULTS: {
       return initialState

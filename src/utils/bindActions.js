@@ -1,30 +1,41 @@
-import * as Redux from 'redux'
-
+/* eslint-disable no-unused-vars */
+import { ActionCreatorsMapObject, bindActionCreators } from 'redux'
+import { MapDispatchToPropsFunction } from 'react-redux'
 /**
- * Takes an object whose values are actionCreators and returns a mapDispatchToProps
- * function that returns an `actions` props containing the bound action creators.
+ * Takes an object whose values are action creators and returns a
+ * mapDispatchToProps function that returns an `actions` prop containing
+ * the bound action creators.
  *
- * @param {Redux.ActionCreatorsMapObject} actionCreators
- * @return {MapDispatchToPropParam}
+ * WHY?
+ * I think grouping redux actions into an `actions` prop makes the code
+ * clearer and easier to read. It makes it easy to distinguish redux actions
+ * from other functions that are passed down as props, such as event handlers.
+ * This function just provides a clean syntax for doing this, similar to
+ *
+ * passing a plain object as the second argument to `connect`, except the
+ * bound action creators are grouped into an `actions` props.
+ *
  * @example
  * import { connect } from 'react-redux'
  * import { firstAction, secondAction } from 'path/to/actionCreators'
  *
- * // The connected component will receive an `actions` props with the
- * // bound action creators
- * const mapDispatchToProps = bindActions({ firstAction, secondAction })
+ * const mapDispatchToProps = bindActions({
+ *   firstAction,
+ *   secondAction
+ * })
+ *
  * connect(null, mapDispatchToProps)(MyComponent)
  *
- * class MyComponent extends React.Component {
- *   componentDidMount() {
- *     const { actions } = this.props
- *     actions.firstAction('payload')
- *   }
- * }
+ * @example
+ * // Dispatching actions from component
+ * const { actions } = this.props
+ * actions.firstAction(payload)
  *
+ * @param {ActionCreatorsMapObject} actionCreators
+ * @return {MapDispatchToPropsFunction}
  */
 export default function bindActions(actionCreators) {
   return (dispatch) => ({
-    actions: Redux.bindActionCreators(actionCreators, dispatch)
+    actions: bindActionCreators(actionCreators, dispatch)
   })
 }

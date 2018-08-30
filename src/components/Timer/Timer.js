@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
-import ResetIcon from '@material-ui/icons/SettingsBackupRestore'
 import IconButton from '@material-ui/core/IconButton'
+import ResetIcon from '@material-ui/icons/SettingsBackupRestore'
+import { capitalize, getTimestamp, formatTime } from '../../utils'
 import ProgressIndicator from '../ProgressIndicator'
-import { requestAnimationFrame, cancelAnimationFrame } from '../../utils'
+import { ALERT_URL } from '../../constants'
 
 /**
  * Handles the timer logic - updating state while timer is running,
@@ -16,121 +17,147 @@ import { requestAnimationFrame, cancelAnimationFrame } from '../../utils'
  * - Circular progress indicator
  * - Start/stop & reset buttons
  */
-export default class Timer extends React.PureComponent {
-  state = { requestID: null }
+export default class Timer extends React.Component {
+  /** Store the requestAnimationFrame id in state */
+  state = { rid: null }
 
-  componentDidMount = () => {
-    // Initialize a new timer on mount
-    this.props.actions.initializeTimer()
-  }
-
-  /** Updates the timer state on each RAF callback */
-  updateTimer = (timestamp) => {
-    const { startTime, duration, actions } = this.props
-    const elapsedTime = timestamp - startTime
-
-    // When the timer reaches zero, start the next session
-    if (elapsedTime >= duration) {
-      this.startNextSession()
-    } else {
-      // Update the elapsed time value in state.
-      actions.updateElapsedTime(elapsedTime)
-      this.setState({ requestID: requestAnimationFrame(this.updateTimer) })
+  componentWillUnMount() {
+    // Stop the requestAnimationFrame loop when component unMounts
+    if (this.state.rid) {
+      window.cancelAnimationFrame(this.state.rid)
     }
   }
 
-  /** Starts the next work/break session. */
-  startNextSession = () => {
-    const { type: previousType, actions } = this.props
-    actions.stopTimer()
-    actions.initializeTimer({
-      type: previousType === 'SESSION' ? 'BREAK' : 'SESSION',
-      startTime: window.performance.now(),
-      isRunning: true
-    })
+  /**
+   * Listen for changes to the `timerState` prop. After a redux action is
+   * dispatched to start or stop the timer, the value of the `timerState`
+   * prop will change. When this occurs, the requestAnimationFrame loop
+   * that updates the elapsed time is stopped/started
+   */
+  componentDidUpdate = (prevProps) => {
+    const { timerState } = this.props
+    if (prevProps.timerState !== timerState) {
+      // When the timer is started, start running the requestAnimationFrame loop
+      if (timerState === 'RUNNING') {
+        this.setState({ rid: window.requestAnimationFrame(this.tick) })
+      }
+      // When the timer is stopped/paused, stop the requestAnimationFrame loop
+      if (timerState !== 'RUNNING') {
+        this.setState({ rid: window.cancelAnimationFrame(this.state.rid) })
+      }
+    }
   }
 
-  /** Listen for changes to props.isRunning */
-  componentDidUpdate = (prevProps) => {
-    // When the timer is stopped/started...
-    if (prevProps.isRunning !== this.props.isRunning) {
-      // Start running the updateTimer loop when the timer is started
-      if (this.props.isRunning) {
-        cancelAnimationFrame(this.state.requestID)
-        this.setState({ requestID: requestAnimationFrame(this.updateTimer) })
-      }
-      // Stop the updateTimer loop when the timer is stopped/paused
-      if (!this.props.isRunning) {
-        this.setState(({ requestID }) => ({
-          requestID: cancelAnimationFrame(requestID)
-        }))
+  /** The callback function that the updates elapsed */
+  tick = () => {
+    const { startTime, duration, actions } = this.props
+    const timestamp = getTimestamp()
+    const elapsedTime = timestamp - startTime
+    if (elapsedTime < duration) {
+      // Dispatch redux action to update elapsed time
+      actions.updateElapsedTime(elapsedTime)
+      this.setState({ rid: window.requestAnimationFrame(this.tick) })
+    } else {
+      // If the full duration of the timer has elapsed, start the next session.
+      this.startNextTimer()
+    }
+  }
+
+  /** Starts the next timer (session/break) when a timer is complete */
+  startNextTimer = () => {
+    const { timerType: previousTimerType, actions } = this.props
+    const nextTimerType = previousTimerType === 'SESSION' ? 'BREAK' : 'SESSION'
+    this.playAudioAlert()
+    // Wait 500ms before starting the next timer
+    window.setTimeout(() => {
+      actions.initializeTimer({ type: nextTimerType })
+      actions.startTimer(getTimestamp())
+    }, 500)
+  }
+
+  /** Toggle the audio alert */
+  playAudioAlert(play = true) {
+    if (this.audioElement) {
+      if (play === true) {
+        this.audioElement.currentTime = 0
+        this.volume = '0.5'
+        this.audioElement.play()
+      } else {
+        this.audioElement.pause()
       }
     }
   }
 
   /** Event handler for the start/stop button */
-  handleToggleButtonClick = (event) => {
-    const { isRunning, actions } = this.props
-    const timestamp = window.performance.now()
-    const toggleTimer = isRunning ? 'stopTimer' : 'startTimer'
-    actions[toggleTimer](timestamp)
+  onStartStopClick = (event) => {
+    const { timerState, actions } = this.props
+    if (timerState === 'RUNNING') {
+      actions.pauseTimer()
+    } else {
+      actions.startTimer(getTimestamp())
+    }
   }
 
   /** Event handler for the reset button */
-  handleResetButtonClick = (event) => {
+  onResetClick = (event) => {
     const { actions } = this.props
-    actions.stopTimer()
+    this.playAudioAlert(false)
+    actions.resetTimer()
     actions.restoreDefaults()
-    actions.initializeTimer()
+  }
+
+  onAudioRef = (element) => {
+    this.audioElement = element
   }
 
   render() {
-    const { remainingTimeString, isRunning, type, percentComplete } = this.props
-    return [
+    const { timerType, remainingTime, timerState, percentComplete } = this.props
+    const { onResetClick, onStartStopClick, onAudioRef } = this
+    return (
       <section className="Timer" key="timer">
         <div className="Timer-content">
-          <h1 className="Timer-label" id="timer-label">
-            {type}
+          <h1 id="timer-label" className="Timer-label">
+            {capitalize(timerType)}
           </h1>
           <div id="time-left" className="Timer-displayTime">
-            {remainingTimeString}
+            {formatTime(remainingTime)}
           </div>
-          <div className="controls">
-            <IconButton onClick={this.handleResetButtonClick}>
+          <div className="Timer-controls">
+            <IconButton id="reset" onClick={onResetClick} color="primary">
               <ResetIcon />
             </IconButton>
-            <Button id="start_stop" onClick={this.handleToggleButtonClick}>
-              {isRunning ? 'Stop' : 'Start'}
+            <Button id="start_stop" onClick={onStartStopClick} color="primary">
+              {timerState === 'RUNNING' ? 'Stop' : 'Start'}
             </Button>
           </div>
         </div>
         <ProgressIndicator percentComplete={percentComplete} />
+        <audio ref={onAudioRef} id="beep" src={ALERT_URL} />
       </section>
-    ]
+    )
   }
 }
 
 Timer.propTypes = {
   /** The type of timer currently*/
-  type: PropTypes.oneOf(['SESSION', 'BREAK']).isRequired,
+  timerType: PropTypes.oneOf(['SESSION', 'BREAK']).isRequired,
   /** The duration of the time in milliseconds */
   duration: PropTypes.number.isRequired,
-  /** The remaining time in HH:MM:SS */
-  remainingTimeString: PropTypes.string.isRequired,
-  /** Elapsed time in milliseconds */
-  elapsedTime: PropTypes.number.isRequired,
+  /** The remaining time (number of seconds) */
+  remainingTime: PropTypes.number.isRequired,
   /** A flag that is true while the timer is running */
-  isRunning: PropTypes.bool.isRequired,
+  timeState: PropTypes.oneOf(['RUNNING', 'STOPPED', 'PAUSED']),
   /** The high res timestamp when timer was started */
   startTime: PropTypes.number,
-  /** Number representing percentage of elapsed time (for progressIndicator) */
+  /** The percentage of time that has elapsed */
   percentComplete: PropTypes.number.isRequired,
   /** Bound redux actions */
   actions: PropTypes.shape({
     initializeTimer: PropTypes.func.isRequired,
     updateElapsedTime: PropTypes.func.isRequired,
-    stopTimer: PropTypes.func.isRequired,
     startTimer: PropTypes.func.isRequired,
+    pauseTimer: PropTypes.func.isRequired,
+    resetTimer: PropTypes.func.isRequired,
     restoreDefaults: PropTypes.func.isRequired
   }).isRequired
 }

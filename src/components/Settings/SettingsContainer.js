@@ -8,6 +8,7 @@ const mapStateToProps = (state) => ({
   breakLength: selectors.getBreakLength(state)
 })
 
+// Injects an `actions` prop containing bound action creators
 const mapDispatchToProps = bindActions({
   setSessionLength: actions.setSessionLength,
   setBreakLength: actions.setBreakLength

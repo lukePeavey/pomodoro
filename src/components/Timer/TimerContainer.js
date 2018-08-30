@@ -6,19 +6,19 @@ import Timer from './Timer'
 const mapStateToProps = (state) => ({
   percentComplete: selectors.getPercentComplete(state),
   duration: selectors.getDuration(state),
-  type: selectors.getTimerType(state),
-  remainingTimeString: selectors.getRemainingTimeString(state),
-  elapsedTime: selectors.getElapsedTime(state),
-  isRunning: selectors.isRunning(state),
-  sessionLength: selectors.getSessionLength(state),
+  timerType: selectors.getTimerType(state),
+  remainingTime: selectors.getRemainingTimeInSeconds(state),
+  timerState: selectors.getTimerState(state),
   startTime: selectors.getStartTime(state)
 })
 
+// Injects an `actions` prop containing bound action creators
 const mapDispatchToProps = bindActions({
-  updateElapsedTime: actions.updateElapsedTime,
   initializeTimer: actions.initializeTimer,
-  stopTimer: actions.stopTimer,
+  updateElapsedTime: actions.updateElapsedTime,
   startTimer: actions.startTimer,
+  pauseTimer: actions.pauseTimer,
+  resetTimer: actions.resetTimer,
   restoreDefaults: actions.restoreDefaults
 })
 
