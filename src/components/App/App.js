@@ -6,8 +6,8 @@ export default class App extends React.PureComponent {
   render() {
     return (
       <div className="App">
-        <Settings />
         <Timer />
+        <Settings />
       </div>
     )
   }

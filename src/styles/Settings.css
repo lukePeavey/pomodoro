@@ -1,9 +1,9 @@
 .Settings {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   width: 100%;
-  max-width: var(--max-content-width);
+  max-width: calc(var(--timer-max-width + 450px));
   margin-bottom: 24px;
 }
 
@@ -14,11 +14,54 @@
   justify-content: center;
 }
 
-.Settings-fieldLabel {
+.Settings-label {
   width: 100%;
+  text-align: center;
+  font-size: 18px;
+}
+
+.Settings-value {
+  font-size: 20px;
+  width: 40px;
   text-align: center;
 }
 
-.Settings-fieldValue {
-  font-size: 20px;
+/* Styles for mobile landscape */
+@media (max-height: 450px) and (orientation: landscape) {
+  .Settings {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  .Settings-field {
+    max-width: 150px;
+    margin: 0 16px;
+  }
+  .Settings-field:first-of-type {
+    margin-right: auto;
+  }
+  .Settings-field:last-of-type {
+    margin-left: auto;
+  }
+}
+
+/* Styles for medium to large screens */
+@media (min-width: 700px) and (min-height: 600px) {
+  .Settings {
+    max-width: 600px;
+  }
+  .Settings-field {
+    margin: 0 32px;
+  }
+  .Settings-fieldLabel {
+    font-size: 18px;
+  }
+}
+
+.Settings-icon {
+  font-size: 42px !important;
 }

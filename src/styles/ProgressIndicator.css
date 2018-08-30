@@ -10,11 +10,11 @@
 
 .Progress-circle {
   fill: transparent;
-  stroke: #eee;
+  stroke: rgba(96, 218, 251, 0.2);
   cx: 50;
   cy: 50;
 }
 
-.Progress-circle.progress {
-  stroke: #b2dfdb;
+.Progress-circle#progress {
+  stroke: var(--primary-color);
 }
