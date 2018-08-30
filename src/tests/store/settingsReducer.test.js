@@ -1,4 +1,7 @@
-import reducer, { actionTypes, initialState } from './settings'
+import reducer, {
+  actionTypes,
+  initialState
+} from '../../store/modules/settings'
 
 describe('Settings Reducer', () => {
   it('Should return initial state', () => {

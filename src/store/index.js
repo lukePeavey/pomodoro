@@ -3,7 +3,7 @@ import configureStore from './configure'
 import * as timerStore from './modules/timer'
 import * as settingsStore from './modules/settings'
 
-const rootReducer = combineReducers({
+export const rootReducer = combineReducers({
   timer: timerStore.default,
   settings: settingsStore.default
 })
