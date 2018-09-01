@@ -59,8 +59,7 @@ describe('Integration Tests', () => {
     wrapper.unmount()
     clock.uninstall()
     // Reset redux state after each test.
-    store.dispatch(actions.restoreDefaults())
-    store.dispatch(actions.resetTimer())
+    store.dispatch(actions.resetAppState())
   })
   /**
    * Tests the settings functionality

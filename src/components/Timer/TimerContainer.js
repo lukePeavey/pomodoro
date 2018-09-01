@@ -18,8 +18,7 @@ const mapDispatchToProps = bindActions({
   updateElapsedTime: actions.updateElapsedTime,
   startTimer: actions.startTimer,
   pauseTimer: actions.pauseTimer,
-  resetTimer: actions.resetTimer,
-  restoreDefaults: actions.restoreDefaults
+  resetAppState: actions.resetAppState
 })
 
 export default connect(

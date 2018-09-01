@@ -19,10 +19,4 @@ describe('Settings Reducer', () => {
       reducer(undefined, { type: actionTypes.SET_BREAK_LENGTH, payload: 30 })
     ).toEqual({ ...initialState, breakLength: 30 })
   })
-
-  it('Should handle RESTORE_DEFAULTS', () => {
-    expect(reducer(undefined, { type: actionTypes.RESTORE_DEFAULTS })).toEqual(
-      initialState
-    )
-  })
 })

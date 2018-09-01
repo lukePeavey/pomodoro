@@ -102,8 +102,7 @@ export default class Timer extends React.Component {
   onResetClick = (event) => {
     const { actions } = this.props
     this.playAudioAlert(false)
-    actions.resetTimer()
-    actions.restoreDefaults()
+    actions.resetAppState()
   }
 
   onAudioRef = (element) => {
@@ -146,7 +145,7 @@ Timer.propTypes = {
   /** The remaining time (number of seconds) */
   remainingTime: PropTypes.number.isRequired,
   /** A flag that is true while the timer is running */
-  timeState: PropTypes.oneOf(['RUNNING', 'STOPPED', 'PAUSED']),
+  timerState: PropTypes.oneOf(['RUNNING', 'STOPPED', 'PAUSED']),
   /** The high res timestamp when timer was started */
   startTime: PropTypes.number,
   /** The percentage of time that has elapsed */
@@ -157,7 +156,6 @@ Timer.propTypes = {
     updateElapsedTime: PropTypes.func.isRequired,
     startTimer: PropTypes.func.isRequired,
     pauseTimer: PropTypes.func.isRequired,
-    resetTimer: PropTypes.func.isRequired,
-    restoreDefaults: PropTypes.func.isRequired
+    resetAppState: PropTypes.func.isRequired
   }).isRequired
 }

@@ -31,11 +31,4 @@ describe('Timer Reducer', () => {
       timerState: 'PAUSED'
     })
   })
-
-  test('Should handle RESET_TIMER', () => {
-    const prevState = { ...initialState, timerState: 'RUNNING' }
-    expect(reducer(prevState, { type: actionTypes.RESET_TIMER })).toEqual(
-      initialState
-    )
-  })
 })

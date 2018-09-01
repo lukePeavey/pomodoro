@@ -23,11 +23,9 @@ export default function settingsReducer(state = initialState, action) {
       const value = Math.min(Math.max(action.payload, MIN), MAX)
       return { ...state, breakLength: value }
     }
-    case actionTypes.RESTORE_DEFAULTS: {
-      return initialState
-    }
-    default:
+    default: {
       return state
+    }
   }
 }
 
@@ -49,8 +47,7 @@ export const selectors = {
 
 export const actionTypes = {
   SET_SESSION_LENGTH: '[settings] SET_SESSION_LENGTH',
-  SET_BREAK_LENGTH: '[settings] SET_BREAK_LENGTH',
-  RESTORE_DEFAULTS: '[settings] RESTORE_DEFAULTS'
+  SET_BREAK_LENGTH: '[settings] SET_BREAK_LENGTH'
 }
 
 export const actions = {
@@ -62,9 +59,5 @@ export const actions = {
   setBreakLength: (minutes) => ({
     type: actionTypes.SET_BREAK_LENGTH,
     payload: minutes
-  }),
-
-  restoreDefaults: () => ({
-    type: actionTypes.RESTORE_DEFAULTS
   })
 }

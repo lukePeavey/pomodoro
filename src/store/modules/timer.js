@@ -30,9 +30,6 @@ export default function timerReducer(state = initialState, action) {
     case actionTypes.UPDATE_ELAPSED_TIME: {
       return { ...state, elapsedTime: action.payload }
     }
-    case actionTypes.RESET_TIMER: {
-      return initialState
-    }
     default: {
       return state
     }
@@ -45,14 +42,14 @@ export default function timerReducer(state = initialState, action) {
 |--------------------------------------------------
 */
 export const selectors = {
-  /** Gets  the elapsed time (in milliseconds) */
-  getElapsedTime: (state) => state.timer.elapsedTime,
   /** Get the type of timer 'SESSION' | 'BREAK' */
   getTimerType: (state) => state.timer.type,
   /** Return the current timerState 'STOPPED' 'RUNNING' | 'PAUSED' */
   getTimerState: (state) => state.timer.timerState,
   /** Get the timestamp when timer was started */
   getStartTime: (state) => state.timer.startTime,
+  /** Gets  the elapsed time (in milliseconds) */
+  getElapsedTime: (state) => state.timer.elapsedTime,
   /**
    * @computed
    * gets the duration of the timer in milliseconds.
@@ -87,8 +84,7 @@ export const actionTypes = {
   INITIALIZE_TIMER: '[timer] INITIALIZE_TIMER',
   START_TIMER: '[timer] START_TIMER',
   PAUSE_TIMER: '[timer] PAUSE_TIMER',
-  UPDATE_ELAPSED_TIME: '[timer] UPDATE_ELAPSED_TIME',
-  RESET_TIMER: '[timer] RESET_TIMER'
+  UPDATE_ELAPSED_TIME: '[timer] UPDATE_ELAPSED_TIME'
 }
 
 export const actions = {
@@ -113,10 +109,5 @@ export const actions = {
   updateElapsedTime: (ms) => ({
     type: actionTypes.UPDATE_ELAPSED_TIME,
     payload: ms
-  }),
-
-  /** Resets the timer to its initial state */
-  resetTimer: () => ({
-    type: actionTypes.RESET_TIMER
   })
 }
