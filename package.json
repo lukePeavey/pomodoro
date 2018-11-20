@@ -2,6 +2,7 @@
   "name": "pomodoro",
   "version": "0.2.0",
   "private": true,
+  "homepage": "https://fcc-pomodoro-timer.surge.sh",
   "dependencies": {
     "@material-ui/core": "^1.5.0",
     "@material-ui/icons": "^2.0.2",
@@ -20,6 +21,7 @@
   },
   "scripts": {
     "precommit": "lint-staged",
+    "deploy": "yarn run build && surge build --domain $npm_package_homepage",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",

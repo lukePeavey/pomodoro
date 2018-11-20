@@ -4,6 +4,8 @@ import { Provider } from 'react-redux'
 import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles'
 import registerServiceWorker from './registerServiceWorker'
 import App from './components/App'
+import IconButton from '@material-ui/core/IconButton'
+import GitHubIcon from './icons/Github'
 import store from './store'
 // Import the styles for the app
 import './styles/index.css'
@@ -18,11 +20,21 @@ const theme = createMuiTheme({
 })
 
 ReactDOM.render(
-  <Provider store={store} key="app">
-    <MuiThemeProvider theme={theme}>
-      <App />
-    </MuiThemeProvider>
-  </Provider>,
+  <React.Fragment>
+    <Provider store={store} key="app">
+      <MuiThemeProvider theme={theme}>
+        <App />
+      </MuiThemeProvider>
+    </Provider>
+    <IconButton
+      component="a"
+      href="https://github.com/lukePeavey/pomodoro"
+      className="githubIcon"
+    >
+      <GitHubIcon />
+    </IconButton>
+  </React.Fragment>,
+
   document.getElementById('root')
 )
 

@@ -19,3 +19,13 @@ body {
   line-height: 1.5;
   word-wrap: break-word;
 }
+
+.githubIcon {
+  position: fixed !important;
+  top: 24px;
+  right: 24px;
+  color: #fff !important;
+}
+.githubIcon svg {
+  font-size: 40px;
+}
