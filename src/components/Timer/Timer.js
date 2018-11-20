@@ -19,13 +19,11 @@ import { ALERT_URL } from '../../constants'
  */
 export default class Timer extends React.Component {
   /** Store the requestAnimationFrame id in state */
-  state = { rid: null }
+  state = { interval: null }
 
   componentWillUnMount() {
     // Stop the requestAnimationFrame loop when component unMounts
-    if (this.state.rid) {
-      window.cancelAnimationFrame(this.state.rid)
-    }
+    window.clearInterval(this.state.interval)
   }
 
   /**
@@ -39,26 +37,21 @@ export default class Timer extends React.Component {
     if (prevProps.timerState !== timerState) {
       // When the timer is started, start running the requestAnimationFrame loop
       if (timerState === 'RUNNING') {
-        this.setState({ rid: window.requestAnimationFrame(this.tick) })
+        this.setState({ interval: window.setInterval(this.tick, 1000) })
       }
       // When the timer is stopped/paused, stop the requestAnimationFrame loop
       if (timerState !== 'RUNNING') {
-        this.setState({ rid: window.cancelAnimationFrame(this.state.rid) })
+        this.setState({ interval: window.clearInterval(this.state.interval) })
       }
     }
   }
 
   /** The callback function that the updates elapsed */
   tick = () => {
-    const { startTime, duration, actions } = this.props
-    const timestamp = getTimestamp()
-    const elapsedTime = timestamp - startTime
-    if (elapsedTime < duration) {
-      // Dispatch redux action to update elapsed time
-      actions.updateElapsedTime(elapsedTime)
-      this.setState({ rid: window.requestAnimationFrame(this.tick) })
+    const { remainingTime, actions } = this.props
+    if (remainingTime > 0) {
+      actions.incrementElapsedTime()
     } else {
-      // If the full duration of the timer has elapsed, start the next session.
       this.startNextTimer()
     }
   }
@@ -69,22 +62,16 @@ export default class Timer extends React.Component {
     const nextTimerType = previousTimerType === 'SESSION' ? 'BREAK' : 'SESSION'
     this.playAudioAlert()
     // Wait 500ms before starting the next timer
-    window.setTimeout(() => {
-      actions.initializeTimer({ type: nextTimerType })
-      actions.startTimer(getTimestamp())
-    }, 500)
+    actions.initializeTimer({ type: nextTimerType })
+    actions.startTimer()
   }
 
   /** Toggle the audio alert */
   playAudioAlert(play = true) {
     if (this.audioElement) {
-      if (play === true) {
-        this.audioElement.currentTime = 0
-        this.volume = '0.5'
-        this.audioElement.play()
-      } else {
-        this.audioElement.pause()
-      }
+      this.audioElement.currentTime = 0
+      this.volume = '0.5'
+      this.audioElement[play ? 'play' : 'pause']()
     }
   }
 
@@ -131,7 +118,7 @@ export default class Timer extends React.Component {
             </Button>
           </div>
         </div>
-        <ProgressIndicator percentComplete={percentComplete} />
+        <ProgressIndicator />
         <audio ref={onAudioRef} id="beep" src={ALERT_URL} />
       </section>
     )
@@ -154,7 +141,7 @@ Timer.propTypes = {
   /** Bound redux actions */
   actions: PropTypes.shape({
     initializeTimer: PropTypes.func.isRequired,
-    updateElapsedTime: PropTypes.func.isRequired,
+    incrementElapsedTime: PropTypes.func.isRequired,
     startTimer: PropTypes.func.isRequired,
     pauseTimer: PropTypes.func.isRequired,
     resetTimer: PropTypes.func.isRequired,

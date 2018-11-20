@@ -27,8 +27,8 @@ export default function timerReducer(state = initialState, action) {
     case actionTypes.PAUSE_TIMER: {
       return { ...state, timerState: 'PAUSED' }
     }
-    case actionTypes.UPDATE_ELAPSED_TIME: {
-      return { ...state, elapsedTime: action.payload }
+    case actionTypes.INCREMENT_ELAPSED_TIME: {
+      return { ...state, elapsedTime: state.elapsedTime + 1000 }
     }
     case actionTypes.RESET_TIMER: {
       return initialState
@@ -87,7 +87,7 @@ export const actionTypes = {
   INITIALIZE_TIMER: '[timer] INITIALIZE_TIMER',
   START_TIMER: '[timer] START_TIMER',
   PAUSE_TIMER: '[timer] PAUSE_TIMER',
-  UPDATE_ELAPSED_TIME: '[timer] UPDATE_ELAPSED_TIME',
+  INCREMENT_ELAPSED_TIME: '[timer] INCREMENT_ELAPSED_TIME',
   RESET_TIMER: '[timer] RESET_TIMER'
 }
 
@@ -110,8 +110,8 @@ export const actions = {
   }),
 
   /** Increments the elapsed time by 1 second */
-  updateElapsedTime: (ms) => ({
-    type: actionTypes.UPDATE_ELAPSED_TIME,
+  incrementElapsedTime: (ms) => ({
+    type: actionTypes.INCREMENT_ELAPSED_TIME,
     payload: ms
   }),
 

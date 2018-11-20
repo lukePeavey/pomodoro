@@ -15,7 +15,7 @@ const mapStateToProps = (state) => ({
 // Injects an `actions` prop containing bound action creators
 const mapDispatchToProps = bindActions({
   initializeTimer: actions.initializeTimer,
-  updateElapsedTime: actions.updateElapsedTime,
+  incrementElapsedTime: actions.incrementElapsedTime,
   startTimer: actions.startTimer,
   pauseTimer: actions.pauseTimer,
   resetTimer: actions.resetTimer,
